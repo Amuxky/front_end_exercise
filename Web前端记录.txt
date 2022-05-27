@@ -1,0 +1,344 @@
+1. Html模板
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+</head>
+<body>
+</body>
+</html>
+
+2. Html引入css、js文件
+<link type="text/css" href="" rel="stylesheet">
+<script type="text/javascript" src=""></script>
+
+3. js内置类型
+空类型：null；
+未定义类型：undefined；
+布尔类型：Boolean；
+数字类型：Number;
+对象：Object；
+字符类型：string；
+符号:symbol (ES6新增)
+
+4. 类型转换
+toString()  转化为字符串，不可以转null和undefined
+Number()    转换为数字，字符串中有一个不是数值的字符，返回NaN
+parseInt()  转换为数字，第一个字符不是数字或者符号就返回NaN
+String()    转换为字符串
+Boolean()   转换为布尔值
+
+5.可重定义 this 这个对象的方法
+call()、apply()、bind() 
+
+6. Cookie属性
+name　　        字段为一个cookie的名称。
+value　　       字段为一个cookie的值。
+domain　        字段为可以访问此cookie的域名。
+path　          字段为可以访问此cookie的页面路径。 比如domain是abc.com,path是/test，那么只有/test路径下的页面可以读取此cookie。
+expires/Max-Age 字段为此cookie超时时间。若设置其值为一个时间，那么当到达此时间后，此cookie失效。不设置的话默认值是Session，意思是cookie会和session一起失效。
+                当浏览器关闭(不是浏览器标签页，而是整个浏览器) 后，此cookie失效。
+Size　　        字段 此cookie大小。
+http　      　  字段  cookie的httponly属性。若此属性为true，则只有在http请求头中会带有此cookie的信息，而不能通过document.cookie来访问此cookie。
+secure　　      字段 设置是否只能通过https来传递此条cookie
+
+secure属性：
+当设置为true时，表示创建的 Cookie 会被以安全的形式向服务器传输，也就是只能在 HTTPS 连接中被浏览器传递到服务器端进行会话验证，如果是 HTTP 连接则不会传递该信息，所以不会被窃取到Cookie 的具体内容。
+HttpOnly属性：
+如果在Cookie中设置了"HttpOnly"属性，那么通过程序(JS脚本、Applet等)将无法读取到Cookie信息，这样能有效的防止XSS攻击。
+Expire属性：
+设置Cookie的失效时间
+
+7. 检验是否为数组
+方法一： instanceof:
+var arr=[];
+console.log(arr instanceof Array) //返回true
+方法二： constructor:
+console.log(arr.constructor == Array); //返回true
+方法三： Array.isArray()
+console.log(Array.isArray(arr)); //返回true
+
+line-height 行间间距
+
+8. 普通表格模板
+<table>
+    <!-- 表头 -->
+    <thead>
+        <!-- 行 -->
+        <tr>
+            <!-- 列 -->
+            <th></th>
+         </tr>
+    </thead>
+    <!-- 表内容 -->
+    <tbody></tbody>
+    <!-- 表页脚 -->
+    <tfoot></tfoot>
+</table>
+
+9. forEach()
+array.forEach(function(currentValue, index, arr), thisValue);
+
+10. Object.defineproperty()在一个对象上定义一个新属性，或者修改一个对象的现有属性
+Object.defineProperty(obj, prop, descriptor)
+obj；要定义属性的对象。
+prop;要定义或修改的属性的名称
+descriptor:要定义或修改的属性描述符
+let infornation = {
+        'name': '小红',
+        'age': 23
+    }
+Object.defineProperty(infornation, age, {
+value:23,//JavaScript 值
+enumerable:true,//控制属性是否可枚举，默认为flase
+writable:true,//控制属性是否可被修改，默认为flase
+configurable:true,//控制属性是否可被删除，默认为flase
+ //当有人读取infornation的sex属性时，此函数就会被调用
+    get() {
+        return;
+    },
+    //当有人修改infornation的sex属性时，此函数就会被调用
+    set(value) {
+
+    }
+})
+
+11. 数据代理
+需求 obj1 下有属性 x ,如何通过 obj2 修改 obj1.x？
+let obj1={'x':100}
+let obj2={};
+Object.defineProperty(obj2,'x',{
+    get(){
+        return obj1.x;
+    },
+    set(value){
+       return obj1.x=value;
+    }
+});
+
+10. Vue 模板
+let vm = new Vue({
+    'el': '#app',
+    data: {
+        'age': 20,
+        'firstName': '张',
+        'lastName': '三'，
+        'isHot': true
+    },
+    //方法
+    methods: {
+        showInfo(e) {
+            console.log(e.keyCode);
+            console.log('dsd');
+        }
+    },
+    //计算属性
+    computed: {
+        fullname: {
+            //1.有人读取fullname时，get就会被调用，且返回值就作为fullname的值
+            //2.初次读取fullname调用
+            get() {
+                return this.firstName + this.lastName
+            },
+            //当fullname被修改时调用
+            set(value) {
+
+            }
+        }
+    },
+    //实例被挂载后调用（初始化页面完成后，对dom节点进行相关操作）
+    mounted: function() {
+        document.querySelector('button').focus();
+    }，
+        //监听
+    watch: {
+        isHot: {
+            immediate: true, //初始化是让handler调用一下
+            deep:true,//深度监听，监听多级结构值
+            //当isHot发生变化时,newValue(变化后的值)，oldVule(变化前的值)
+            handler(newValue, oldVule) {
+
+            }
+        }
+        //调用API监听
+        //vm.$watch('isHot', function (newVal, oldVal) {
+        //做点什么
+        //})
+    }，
+    //过滤器
+    filters{
+
+    },
+    //自定义指令
+    directives{
+        focus:{
+            inserted (el,binding){
+        }
+        }
+       
+    }
+});
+
+11. Vue生命周期
+vm的一生
+将要创建 ==> 调用 beforeCreate 函数
+创建完毕 ==> 调用 created 函数
+将要挂载 ==> 调用 beforeMount 函数
+挂载完毕 ==> 调用 mounted 函数
+将要更新 ==> 调用 beforeUpdate 函数
+更新完毕 ==> 调用 updated 函数
+将要销毁 ==> 调用 beforeDestroy 函数
+创建完毕 ==> 调用 destroyed 函数
+new Vue({
+    'el': '#app',
+    'data': {},
+    //初始化生命周期、事件完成,但代理数据还未开始
+    beforeCreate() {
+
+    },
+    //初始化数据监测、数据代理完成
+    created() {
+
+    },
+    //页面呈现未经Vue编译到DMO结构（Vue已生成虚拟DMO 在内存中），D对MO的操作，最终都不奏效
+    beforeMount() {
+
+    },
+    mounted() {
+
+    },
+    //页面是旧的，但数据是新的
+    beforeUpdate() {
+
+    },
+    //页面是新的，数据也是新的
+    updated() {
+
+    },
+    //销毁vm实例前，在此周期一般进行关闭定时器、取消订阅信息、解除绑定自定义事件等收尾操作
+    beforeDestroy() {
+
+    },
+    //销毁vm实例
+    destroyed() {
+
+    }
+});
+
+12. Vue组件
+步骤：1. 创建组件 2. 注册组件 3. 使用组件
+使用 Vue.extend 创建
+const weather = Vue.extend({
+    'template': `<div>天气<span>{{hot}}</span></div>`,
+    'data': function() {
+        return {
+            hot: '热'
+        }
+    }
+});
+使用 components 注册组件
+局部注册
+const vm = new Vue({
+    'el': '#app',
+    'components': {
+        weather
+    }
+})
+全局注册
+Vue.component('weather', Vue.extend({ /* ... */ }))
+使用组件
+<body>
+    <div id="app">
+        <weather></weather>
+    </div>
+</body>
+
+13. 数组原生方法
+pop、push、shift、unshift、foreach、map、filte、slice、splic、sort、reverse、some、every、reducce、concat、join、indexOf、lastIndexOf
+
+14. 安装 vue 脚手架
+第一步：全局安装@vue/cli
+npm install -g @vue/cli
+第二步：切换到你要创建项目的目录，然后使用命令创建项目
+vue create '项目名称'
+第三步：启动项目 （到创建的项目目录下）
+npm run serve
+
+查看webpack配置
+vue inspect > output.js
+
+Local:   http://localhost:8080/
+Network: http://192.168.1.3:8080/
+
+15.实现水平垂直居中
+方法一：父元素设置：display:flex; justify-content:center; align-items:center
+方法二：父元素设置弹性盒display:flex; 子元素可以设置margin: auto;
+
+15. vue路由守卫
+全局路由守卫
+//全局前置守卫
+router.beforeResolve(function(to,from,next){
+
+})
+//全局后置守卫
+router.afterEach((to, from) => {
+
+})
+
+路由独享守卫
+beforeEnter:function(to, from){
+
+}
+
+组件守卫
+const UserDetails = {
+  template: `...`,
+  //通过路由规则，进入该组件时被调用
+  beforeRouteEnter(to, from) {
+    // 在渲染该组件的对应路由被验证前调用
+    // 不能获取组件实例 `this` ！
+    // 因为当守卫执行时，组件实例还没被创建！
+  },
+  beforeRouteUpdate(to, from) {
+    // 在当前路由改变，但是该组件被复用时调用
+    // 举例来说，对于一个带有动态参数的路径 `/users/:id`，在 `/users/1` 和 `/users/2` 之间跳转的时候，
+    // 由于会渲染同样的 `UserDetails` 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+    // 因为在这种情况发生的时候，组件已经挂载好了，导航守卫可以访问组件实例 `this`
+  },
+  //通过路由规则，离开该组件时被调用
+  beforeRouteLeave(to, from) {
+    // 在导航离开渲染该组件的对应路由时调用
+    // 与 `beforeRouteUpdate` 一样，它可以访问组件实例 `this`
+  },
+}
+
+16. vuex环境搭建
+import Vue from 'vue'
+import Vuex from 'vuex'
+Vue.use(Vuex);
+//该文件用于创建VUEX中最为核心的stroe
+
+//准备actions 用于响应组件中的动作
+const actions = {
+
+}
+
+//准备mutations 用于操作数据
+const mutations = {
+
+}
+
+//准备state 用于存储数据
+const state = {
+
+}
+
+const store = new Vuex.Store({
+    actions,
+    mutations,
+    state
+})
+
+export default store 
+
