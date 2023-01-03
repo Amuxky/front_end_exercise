@@ -342,3 +342,341 @@ const store = new Vuex.Store({
 
 export default store 
 
+ 
+17. flex布局
+ 容器中指定Flex布局
+ .box{
+    display:flex;
+ }
+ 行内指定Flex布局
+ .box{
+    display:inline-flex;
+ }
+
+ 容器六个属性设置
+ 1. flex-direction:决定容器内多个div的排列方向
+ .box {
+  flex-direction: row | row-reverse | column | column-reverse;
+ }
+ 水平
+ row:从左至右排列
+ row-reverse:从右至左排列
+ 垂直
+ column:从上往下排列
+ column-reverse:从下往上排列
+ 
+ 2. flex-wrap: 决定一条水平轴上排不下,如何换行
+ .box{
+   flex-wrap: nowrap | wrap | wrap-reverse;
+ }
+ nowrap:不换行
+ wrap:换行,第一行在上方
+ wrap-reverse:换行,第一行在下方
+
+ 3. flex-flow: flex-direction 属性和 flex-wrap 属性的简写形式，默认值为row nowrap。
+ 
+ 4. justify-content:决定在主轴上的对齐方式
+ .box {
+  justify-content: flex-start | flex-end | center | space-between | space-around;
+ }
+ flex-start（默认值）：左对齐
+ flex-end：右对齐
+ center： 居中
+ space-between：两端对齐，项目之间的间隔都相等。
+ space-around：每个项目两侧的间隔相等。所以，项目之间的间隔比项目与边框的间隔大一倍。
+
+ 5. align-items
+ .box {
+   align-items: flex-start | flex-end | center | baseline | stretch;
+ }
+ 交叉轴->容器top至容器bottom(头部至底部)
+ flex-start：交叉轴的起点对齐。
+ flex-end：交叉轴的终点对齐。
+ center：交叉轴的中点对齐。
+ baseline: 项目的第一行文字的基线对齐。
+ stretch（默认值）：如果项目未设置高度或设为auto，将占满整个容器的高度。
+
+ 6. align-content:属性定义了多根轴线的对齐方式
+
+ 行内六个属性
+ 1. order:定义行内排列顺序.数值越小越靠前
+ .item {
+   order: <integer>;
+ }
+
+ 2. flex-grow:定义行内内容放大比例
+ .item {
+   flex-grow: <number>; /* default 0 */
+ }
+
+ 3. flex-shrink:定义行内内容缩小比例
+ .item {
+  flex-shrink: <number>; /* default 1 */
+ }
+
+ 4. flex-basis
+
+ 5. flex:属性是 flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选。
+
+ 6. align-self
+
+18. 格式化日期方法 
+ function getDate(type,dateNum){
+  var date;
+  if(dateNum === ''){
+    return '';
+  }
+  if(dateNum!=null){
+    date = new Date(dateNum);
+  }else{
+    date = new Date();
+  }
+  var Y = date.getFullYear();
+  var M = date.getMonth()+1 > 9?date.getMonth()+1:'0'+parseInt(date.getMonth()+1);
+  var D = date.getDate()>9?date.getDate():'0'+date.getDate();
+  var week = ['日','一','二','三','四','五','六'][date.getDay()];
+  var H = date.getHours()>9?date.getHours():'0'+date.getHours();
+  var m = date.getMinutes()>9?date.getMinutes():'0'+date.getMinutes();
+  var s = date.getSeconds()>9?date.getSeconds():'0'+date.getSeconds();
+  var time = '';
+  if(type == 1){
+    time = Y+'-'+M+'-'+D;
+  }else if(type == 2){
+    time = Y+'-'+M+'-'+D+' '+H+':'+m+':'+s;
+  }else if(type == 3){
+    time = Y+'-'+M;
+  }else if(type == 4){
+    time = Y+'-'+M+'-'+D+' '+H+':'+m;
+  }else{
+    time = Y+' 年 '+M+' 月 '+D+' 日 &nbsp;&nbsp;&nbsp; 星期'+week;
+  }
+  return time;
+}
+
+19. 推算往前几天或退后几天的日期
+ //获取往前推的日期，// type = d,num 为往前推几天；// type = w,num 为往前推几周；// type = m,num 为往前推几月； this.$getDate此方法为(18)格式化时间方法
+ export function getDatePrev (type,num){
+  var time = '';
+  if(num===''||num===undefined||num===null){
+    return '';
+  }
+  if(type === 'd'){
+    time = this.$getDate(1,new Date().getTime() - num * 24 *60 *60 * 1000);
+  }else if(type === 'w'){
+    time = this.$getDate(1,new Date().getTime() - num * 7 * 24 *60 *60 * 1000);
+  }else if(type === 'm'){
+    time = this.$getDate(1,new Date().getTime() - num * 30 * 24 *60 *60 * 1000);
+  }
+
+  return time;
+}
+
+20. 数字转中文 例如:1->一 2->二
+ function numToChinese(num) {
+  let numArr = ["零","一","二","三","四","五","六","七","八","九"];
+  let numLimit = ["亿","万",""];//设置数字上限
+  let numUnit = ["千","百","十",""];
+  //num四位数是一个阶段对应 numLimit 每个阶段对应一个 numUnit，每个数字对应numArr。
+  num = num.toString();
+  num = num.split('');
+  while (num.length < numLimit.length*4){
+    num.unshift('');
+  }
+  // console.log(num)
+  let numLength = num.length;
+  let str = "";
+  let limit = Math.ceil(numLength/4);
+  // console.log(limit)
+  for(let i = 1;i <= limit;i++){
+    let start = (i -1) * 4;
+    let end = i * 4;
+    let limitNum = num.slice(start,end);
+    // console.log(limitNum)
+    for(let j = 0;j <limitNum.length ;j++){
+      if(limitNum[j]!==''){
+        let char = numArr[limitNum[j]];
+        let unit = numUnit[j];
+        if(limitNum[j] == 0){
+          unit = '';
+        }
+        str += char+unit;
+      }
+    }
+    let hasValue = limitNum.filter(val=>{
+      return val!=='';
+    });
+    str = str.replace(/(零{2,})/,'零');//中间超过两个零替换为一个零
+    if(str!=='零'){
+      str = str.replace(/(零*)$/,'');//结尾去掉零
+    }
+    if(hasValue.length > 0){
+      str+=numLimit[i-1];
+    }
+  }
+
+  str = str.replace(/^一十/,'十');
+  return str;
+}
+
+21. vue $event获取当前Dmo元素
+ e.currentTarget;//绑定事件的元素
+ e.currentTarget.children//绑定事件的子元素
+ e.srcElement.style.background="red";//可以对获取的元素进行操作
+ e.currentTarget.previousElementSibling.innerHTML;//获得点击元素的前一个元素
+ e.currentTarget.firstElementChild;//获得点击元素的第一个子元素
+ e.currentTarget.nextElementSibling;//获得点击元素的下一个元素
+ e.currentTarget.getElementById("string");//获得点击元素中id为string的元素
+ e.currentTarget.getAttributeNode('string');//获得点击元素的string属性
+ e.currentTarget.parentElement;//获得点击元素的父级元素
+ e.currentTarget.previousElementSibling.firstElementChild.innerHTML;//获得点击元素的前一个元素的第一个子元素的HTML值
+
+22.父组件访问子组件方法 
+方法一
+this.$refs['子组件'].子组件方法名；
+方法二
+或 通过组件的$emit、$on方法
+父组件：this.$refs['子组件'].$emit("子组件方法名")
+
+23.子组件访问父组件方法
+方法一
+this.$partent.父组件方法名
+方法二
+在子组件中通过用$emit触发父组件中的方法
+方法三
+父组件把方法传入子组件中，子组件即可直接调用
+
+24.兄弟组件之间传值
+方法一
+通过借用中央事件总线bus
+在外部建立Bus.js文件，Bus.js文件中实例化vue，然后兄弟组件分别引入Bus.js文件，
+例:
+兄弟组件A监听方法send
+Bus.$on('send',(data)=>{})
+兄弟组件B触发方法send
+Bus.$emit('send',(data)=>{})
+方法二
+在main.js，vue原型上添加Bus对象
+Vue.prototype.bus=new Vue();
+兄弟组件A监听方法send
+this.bus.$on('send',function(data){})
+兄弟组件B触发方法send
+this.bus.$emit('send',data)
+
+//解决两个数相加精度丢失问题
+export function floatsum(a,b){
+  if(a==undefined){return}
+  if(b==undefined){return}
+  if(a==0){a='0'}
+  if(b==0){b='0'}
+  let c = 0,d = 0,
+    e = a.toString(),
+    f = b.toString();
+  // console.log(e)
+  // console.log(f)
+  try {
+    c += e.split(".")[1].length;
+  } catch (f) {
+    // console.log(f)
+  }
+  try {
+    d += f.split(".")[1].length;
+  } catch (f) {
+    // console.log(f)
+  }
+
+  let jd = c > d?c:d;
+  // console.log(c)
+  // console.log(e)
+  // console.log(f)
+  if(jd > 0){
+    let numstr1 = e.replace(".", "")+`${Math.pow(10, (jd-c)).toString().slice(1)}`;
+    let numstr2 = f.replace(".", "")+`${Math.pow(10, (jd-d)).toString().slice(1)}`;
+    return (Number(numstr1) + Number(numstr2)) / Math.pow(10,jd);
+  }else{
+    return Number(e)+Number(f);
+  }
+  // return parseFloat(((e * Math.pow(10, c)) + (f *Math.pow(10, c)))/Math.pow(10, c));
+}
+
+/**解决两个数相乘精度丢失问题*/
+export function floatMul(a, b) {
+  if(a==undefined){return}
+  if(b==undefined){return}
+  if(a==0){a='0'}
+  if(b==0){b='0'}
+  var c = 0,
+    d = a.toString(),
+    e = b.toString();
+  try {
+    c += d.split(".")[1].length;
+  } catch (f) {
+    // console.log(f)
+  }
+  try {
+    c += e.split(".")[1].length;
+  } catch (f) {
+    // console.log(f)
+  }
+  return Number(d.replace(".", "")) * Number(e.replace(".", "")) / Math.pow(10, c);
+}
+/**解决两个数相除精度丢失问题*/
+export function floatDiv(arg1, arg2) {
+  var r1 = arg1.toString(),
+    r2 = arg2.toString(),
+    m, resultVal, d = arguments[2];
+  m = (r2.split(".")[1] ? r2.split(".")[1].length : 0) - (r1.split(".")[1] ? r1.split(".")[1].length : 0);
+  resultVal = Number(r1.replace(".", "")) / Number(r2.replace(".", "")) * Math.pow(10, m);
+  return typeof d !== "number" ? Number(resultVal) : Number(resultVal.toFixed(parseInt(d)));
+}
+/**解决两个数相减精度丢失问题*/
+export function floatSub(arg1, arg2) {
+  var r1, r2, m, n;
+  try {
+    r1 = arg1.toString().split(".")[1].length
+  }
+  catch (e) {
+    r1 = 0
+  }
+  try {
+    r2 = arg2.toString().split(".")[1].length
+  }
+  catch (e) {
+    r2 = 0
+  }
+  m = Math.pow(10, Math.max(r1, r2))
+  n=(r1>=r2)?r1:r2;
+  return ((arg1*m-arg2*m)/m)
+}
+
+//日期格式化
+function (dateStr,fmt){
+  //防止2021-05-13T16:00:00.000Z格式包含000Z出现问题
+  // date=new Date(date.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, ''));
+  if(!dateStr)return '';
+  let date = new Date(dateStr);
+
+  if(date.toString()==='Invalid Date'){
+    if(dateStr.toString().indexOf('-') > -1){
+      date = new Date(dateStr.toString().replace(/-/g,'/'));
+    }else{
+      return '';
+    }
+  }
+
+  var o = {
+    "M+" : date.getMonth()+1, //月份
+    "d+" : date.getDate(), //日
+    "h+" : date.getHours()%12 == 0 ? 12 : date.getHours()%12, //小时
+    "H+" : date.getHours(), //小时
+    "m+" : date.getMinutes(), //分
+    "s+" : date.getSeconds(), //秒
+    "q+" : Math.floor((date.getMonth()+3)/3), //季度
+    "S" : date.getMilliseconds() //毫秒
+  };
+  if(/(y+)/.test(fmt))
+    fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));
+  for(var k in o)
+    if(new RegExp("("+ k +")").test(fmt))
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+  return fmt;
+};
