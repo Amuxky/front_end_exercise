@@ -680,3 +680,231 @@ function (dateStr,fmt){
       fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
   return fmt;
 };
+
+数组对象去重
+//data=>要去重的数组；checkCode=>['code'],code为重复的字段
+function getOnlyArr (data,checkCode) {
+  // console.log(data)
+  if(Array.isArray(data)){
+    let arrOnly = [];
+    if(data.length > 0){
+      for(let i = 0;i < data.length;i++){
+        let item = data[i];
+        let hasAdd = false;
+        //如果去重数组中值为对象
+        // console.log(typeof(item))
+        if(typeof(item) === 'object'){
+          for(let j = 0;j < arrOnly.length;j++){
+            let itemOnly = arrOnly[j];
+            let allSame = true;
+            for(let m = 0;m<checkCode.length;m++){
+              let v = checkCode[m];
+              if(item[v] !== itemOnly[v]){
+                allSame = false;
+                break;
+              }
+            }
+            if(allSame){
+              hasAdd = true;
+              break;
+            }else{
+              hasAdd = false;
+            }
+          }
+        } //如果去重数组中值为字符串
+        else if(typeof(item) === 'string'){
+          hasAdd = arrOnly.includes(item);
+        }
+
+        if(!hasAdd){
+          arrOnly.push(item)
+        }
+      }
+      // console.log(arrOnly)
+      return arrOnly;
+    }else{
+      return data;
+    }
+  }
+};
+
+检测数组中是否有相同元素
+function isRepeat(arr){
+      var hash ={};
+      for(var i in arr){
+        if(hash[arr[i]]){
+          return true
+        }
+        hash[arr[i]] = true;
+      }
+      return false;
+  }
+
+  根据年月日判断是一年里的第几周 第一天为周一
+GetWeekIndex(dateobj) {
+          var firstDay = this.GetFirstWeekBegDay(dateobj.getFullYear());
+          if (dateobj < firstDay) {
+              firstDay = this.GetFirstWeekBegDay(dateobj.getFullYear() - 1);
+          }
+          let d = Math.floor((dateobj.valueOf() - firstDay.valueOf()) / 86400000);
+          //document.write(dateobj.getYear() + "/" + (dateobj.getMonth()+1) + "/" + dateobj.getDate()  + " 第" + (Math.floor(d / 7) + 1) + "周"+"<br/>");
+          return Math.floor(d / 7) + 1;
+      },
+       GetFirstWeekBegDay(year) {
+          var tempdate = new Date(year, 0, 1);
+          var temp = tempdate.getDay();
+          if (temp == 1)
+              return tempdate;
+          temp = temp == 0 ? 7 : temp;
+          tempdate = tempdate.setDate(tempdate.getDate() + (8 - temp));
+          return new Date(tempdate);
+      },
+
+//type(d:天,w:周,m:月,y:年),num:数量 date:日期
+getDatePrev(type,num,date){
+        var time = '';
+        date = new Date(date);
+        if(type === 'd'){
+            time = this.$getDate(1,date.getTime() - num * 24 *60 *60 * 1000);
+        }else if(type === 'w'){
+            time = this.$getDate(1,date.getTime() - num * 7 * 24 *60 *60 * 1000);
+        }else if(type === 'm'){
+            time = this.$getDate(1,date.getTime() - num * 30 * 24 *60 *60 * 1000);
+        }else if(type === 'y'){
+            let year = date.getFullYear();
+            let month =date.getMonth();
+            let day = date.getDate();
+            year = new Date(date.setFullYear(year-num)).getFullYear();
+            time = this.$getDate(1,new Date(year,month,day));
+        }
+        return time;
+    },
+
+
+//一级数组对象，根据key值组合多级
+//[{code1:'',code2''}]=>{code1:{code2:{code1:'',code2''}}}
+//[{code1:'',code2''}]=>[{code:'',children:[{code1:'',code2''}]}]
+//arrData:数组数据，arrCode:分级字段数组可多级
+export function CascadeArr(arrData,arrCode) {
+  let arrResult = [];
+  let arrCodeObj = {};
+  // console.log(JSON.parse(JSON.stringify(arrData)))
+  // console.log(JSON.parse(JSON.stringify(arrCode)))
+  for(let i = 0;i < arrData.length;i++){
+    let item = arrData[i];
+    for(let j = 0;j < arrCode.length;j++){
+      getCodeCascade(arrCodeObj,0,j,arrCode.length-1);
+    }
+    //obj传入的每一级对象，
+    // idx:分级数组code每一级都要从第一级开始循环添加，
+    // idxlen:分级数组code下标（当前级别递归循环次数）,
+    // alllen:分级数组code长度（一共多少级）,
+    function getCodeCascade(obj, idx, idxlen,alllen) {
+      if(idx < idxlen){
+        if(!obj.hasOwnProperty(item[arrCode[idx]])){
+          obj[item[arrCode[idx]]] = {};
+        }
+        getCodeCascade(obj[item[arrCode[idx]]],idx+1,idxlen,alllen);
+      }else{
+        if(idx === idxlen&&idx === alllen){
+          if(!obj.hasOwnProperty(item[arrCode[idx]])){
+            obj[item[arrCode[idx]]] = [];
+          }
+
+          obj[item[arrCode[idx]]].push(item);
+        }else{
+          if(!obj.hasOwnProperty(item[arrCode[idx]])){
+            obj[item[arrCode[idx]]] = {};
+          }
+        }
+      }
+    }
+  }
+  // console.log(JSON.parse(JSON.stringify(arrCodeObj)))
+  let arrCellWidth = [];//设置列宽所用数据element ui table 用来设置列宽
+  //通过层级对象数据，获取层级数组
+  let getCascadeArr = (objOrigin,level,parent) => {
+    for(let k in objOrigin){
+      let objItem = objOrigin[k];
+      let obj = {
+        id:this.$getGuid(),
+        level:`${parseFloat(level)+1}`,
+        children:[],
+      };
+      obj[arrCode[level]] = k;
+      // console.log(JSON.parse(JSON.stringify(objItem)))
+      // console.log(JSON.parse(JSON.stringify(obj)))
+      if(!Array.isArray(objItem)){
+        if(parent){
+          parent.children.push(obj);
+        }
+        getCascadeArr(objItem,parseFloat(level)+1,obj);
+      }else{
+        if(parent){
+          let lastLevel = {
+            id:this.$getGuid(),
+            level:`${parseFloat(level)+1}`,
+            children:[],
+          };
+
+          for(let l = 0;l < objItem.length;l++){
+            let lastItem = objItem[l];
+            if(!lastLevel.hasOwnProperty(arrCode[level])){
+              lastLevel[arrCode[level]] = lastItem[arrCode[level]];
+            }
+            // let findIdx = lastLevel.children.findIndex(val=>{
+            //   return val[arrCode[level]] === lastItem[arrCode[level]];
+            // });
+            lastItem = {
+              id:this.$getGuid(),
+              level:`${parseFloat(level)+2}`,
+              ...objItem[l],
+            };
+            lastLevel.children.push(lastItem);
+            arrCellWidth.push(lastItem);
+          }
+          // console.log(JSON.parse(JSON.stringify(lastLevel)))
+          // console.log(JSON.parse(JSON.stringify(parent.children)))
+          parent.children.push(lastLevel);
+          arrCellWidth.push(lastLevel);
+        }else{
+          if(arrCode.length === 1){
+            obj['children'] = objItem;
+          }
+        }
+      }
+      arrCellWidth.push(obj);
+      if(level === 0){
+        arrResult.push(obj);
+      }
+    }
+  };
+  getCascadeArr(arrCodeObj,0);
+
+  // console.log(JSON.parse(JSON.stringify(arrResult)))
+  return {CascadeObj:arrCodeObj,CascadeArr:arrResult,arrCellWidth:arrCellWidth};
+}
+
+//多级转一级对象中有children的数组，一级一级嵌套的多级转为一级
+//参数data:{code1:'',code2:'',children:[{code3:'',code4:'',children:[{},{},{}]},{},{}]}
+//返回值为数组[{code1:'',code2:'',code3:'',code4:'',...}]
+export function MultiToOne(data,item) {
+  let checkList = [];
+  let getOne = function (data,item) {
+    let objItem = item||{};
+    let {children,...others} = data;
+    objItem = {
+      ...objItem,
+      ...others,
+    };
+    if(typeof data === 'object'&&data.hasOwnProperty('children')){
+      for(let i = 0;i < data.children.length;i++){
+        getOne(data.children[i],objItem);
+      }
+    }else{
+      checkList.push(objItem);
+    }
+  };
+  getOne(data);
+  return checkList;
+}
